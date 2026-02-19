@@ -4,8 +4,10 @@ const cors = require("cors");
 const multer = require("multer");
 const jsonwebtoken = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const dotenv = require("dotenv");
+dotenv.config();
 
-
+const path = require("path");
  let app = express();
  app.use(cors());
 app.use(express.json());
@@ -150,9 +152,15 @@ app.post("/login",upload.none(),async(req,res)=>{
   res.json({status:"Failure",msg:"Nothing to delete"})
  }
  })
+
+ app.use(express.static(path.join(__dirname, "client/build")));
+
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "client/build", "index.html"));
+});
  
- app.listen(3333,()=>{
-    console.log("Listening to port 3333")
+ app.listen(process.env.PORT,()=>{
+    console.log(`Listening to port ${process.env.PORT}`)
  })
 
 let userSchema = new mongoose.Schema({
@@ -169,7 +177,7 @@ let user = new mongoose.model("users",userSchema,"2510users");
 
 let connectedToMDB = async ()=>{
     try{
-    await mongoose.connect("mongodb+srv://vemulajyothi24_db_user:mernbatch@cluster0.9v9nind.mongodb.net/MERN2510?appName=Cluster0");
+    await mongoose.connect(process.env.MDBURL);
     console.log("Successfully Connected To MDB");
     
     }catch(err){
